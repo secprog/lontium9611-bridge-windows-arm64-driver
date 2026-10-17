@@ -1,0 +1,100 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Licensed under the GNU General Public License, version 2 only.
+# Provided without warranty. See LICENSE for the license text.
+
+name: Build ARM64 drivers
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version_state:
+        description: Saved source-versions.json for version-state recovery
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: driver-versions-${{ github.repository }}-${{ github.event_name == 'pull_request' && github.ref || 'builds' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Cache SDK and WDK
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/lt9611-packages
+          key: lt9611-windows-arm64-kits-${{ hashFiles('.github/scripts/packages.config') }}
+
+      - name: Restore SDK and WDK
+        run: |
+          nuget restore .github/scripts/packages.config -PackagesDirectory "$env:RUNNER_TEMP/lt9611-packages" -Source https://api.nuget.org/v3/index.json -NonInteractive
+          if ($LASTEXITCODE -ne 0) { throw 'SDK/WDK restore failed.' }
+
+      - name: Restore source-version cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/lt9611-versions
+          key: lt9611-source-versions-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: lt9611-source-versions-v1-
+
+      - name: Restore version-state backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RECOVERED_VERSION_STATE: ${{ inputs.version_state }}
+        run: ./.github/scripts/restore-versions.ps1 -VersionCacheDirectory "$env:RUNNER_TEMP/lt9611-versions"
+
+      - name: Build drivers and prepare download
+        id: drivers
+        run: |
+          ./.github/scripts/build-drivers.ps1 -PackageDirectory "$env:RUNNER_TEMP/lt9611-packages" -OutputDirectory "$env:RUNNER_TEMP/lt9611-build" -ArtifactDirectory "$env:RUNNER_TEMP/lt9611-artifacts" -VersionCacheDirectory "$env:RUNNER_TEMP/lt9611-versions"
+
+      - name: Upload drivers, symbols and source
+        uses: actions/upload-artifact@v7
+        with:
+          name: lt9611-arm64-${{ steps.drivers.outputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lt9611-artifacts/
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9
+
+      - name: Upload version-state backup
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: actions/upload-artifact@v7
+        with:
+          name: source-versions
+          path: ${{ runner.temp }}/lt9611-versions/source-versions.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Save source-version cache
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/lt9611-versions
+          key: lt9611-source-versions-v1-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lt9611-build-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lt9611-build/logs/
+          if-no-files-found: ignore
+          retention-days: 14

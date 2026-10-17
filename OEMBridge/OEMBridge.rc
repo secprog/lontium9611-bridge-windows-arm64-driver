@@ -1,0 +1,10 @@
+/*
+ * SPDX-License-Identifier: GPL-2.0-only
+ * Licensed under the GNU General Public License, version 2 only.
+ * Provided without warranty. See LICENSE for the license text.
+ */
+
+#define LT9611_FILE_DESCRIPTION "Lontium LT9611 HDMI Bridge Service"
+#define LT9611_INTERNAL_NAME "OEMBridge"
+#define LT9611_ORIGINAL_FILENAME "OEMBridge.sys"
+#include "../DriverVersion.rc"

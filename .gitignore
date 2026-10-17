@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Licensed under the GNU General Public License, version 2 only.
+# Provided without warranty. See LICENSE for the license text.
+
+out/
+obj/
+ARM64/
+x64/
+.vs/
+*.user
+*.log

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-License-Identifier: GPL-2.0-only
+Licensed under the GNU General Public License, version 2 only.
+Provided without warranty. See LICENSE for the license text.
+-->
+
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8B6A2C51-3D4E-4F7A-9B02-6C1E5D8A9F30}</ProjectGuid>
+    <TemplateGuid>{497e31cb-056b-4f31-abb8-447fd55ee5a5}</TemplateGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration>Release</Configuration>
+    <Platform Condition="'$(Platform)' == ''">ARM64</Platform>
+    <RootNamespace>OEMBridge</RootNamespace>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Universal</DriverTargetPlatform>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\Version.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <EnableInf2cat>false</EnableInf2cat>
+    <KMDF_VERSION_MAJOR>1</KMDF_VERSION_MAJOR>
+    <KMDF_VERSION_MINOR>15</KMDF_VERSION_MINOR>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="Driver.h" />
+    <ClInclude Include="Gpio.h" />
+    <ClInclude Include="LpiMux.h" />
+    <ClInclude Include="HdmiAudio.h" />
+    <ClInclude Include="HdmiAudioAbi.h" />
+    <ClInclude Include="Cec.h" />
+    <ClInclude Include="OEMBridgeIoctl.h" />
+    <ClInclude Include="Qdi.h" />
+    <ClInclude Include="Spb.h" />
+    <ClInclude Include="Trace.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Device.c" />
+    <ClCompile Include="Cec.c" />
+    <ClCompile Include="ChildCec.c" />
+    <ClCompile Include="DisplaySettings.c" />
+    <ClCompile Include="Driver.c" />
+    <ClCompile Include="Gpio.c" />
+    <ClCompile Include="LpiMux.c" />
+    <ClCompile Include="HdmiAudio.c" />
+    <ClCompile Include="QdiBridge.c" />
+    <ClCompile Include="Spb.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OEMBridge.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="OEMBridge.inf" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

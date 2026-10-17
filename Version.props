@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-License-Identifier: GPL-2.0-only
+Licensed under the GNU General Public License, version 2 only.
+Provided without warranty. See LICENSE for the license text.
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Lt9611BuildVersion Condition="'$(Lt9611BuildVersion)'==''">1.0.0.0</Lt9611BuildVersion>
+    <Lt9611BuildDate Condition="'$(Lt9611BuildDate)'==''">*</Lt9611BuildDate>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Inf>
+      <SpecifyDriverVerDirectiveDate>true</SpecifyDriverVerDirectiveDate>
+      <DateStamp>$(Lt9611BuildDate)</DateStamp>
+      <SpecifyDriverVerDirectiveVersion>true</SpecifyDriverVerDirectiveVersion>
+      <TimeStamp>$(Lt9611BuildVersion)</TimeStamp>
+    </Inf>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Lt9611UseBuildVersion)'=='true'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(Lt9611BuildMetadataDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LT9611_BUILD_VERSION_GENERATED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(Lt9611BuildMetadataDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LT9611_BUILD_VERSION_GENERATED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+</Project>

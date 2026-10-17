@@ -1,0 +1,110 @@
+; SPDX-License-Identifier: GPL-2.0-only
+; Licensed under the GNU General Public License, version 2 only.
+; Provided without warranty. See LICENSE for the license text.
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider    = %ProviderName%
+DriverVer   = 01/01/1999,1.0.0.0
+CatalogFile = OEMBridge.cat
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+OEMBridge.sys     = 1,,
+OEMBridgeProp.dll = 1,,
+P8CecUde.sys      = 1,,
+
+[Manufacturer]
+%ManufacturerName% = Standard,NTARM64.10.0...19041
+
+[Standard.NTARM64.10.0...19041]
+%DeviceName% = OEMBridge_Device, ACPI\LNTI9611
+%P8CecName%  = P8Cec_Device, OEMBRIDGE\P8CEC
+
+[OEMBridge_Device.NT]
+CopyFiles = Drivers_Dir, PropPage_Dir
+AddReg    = OEMBridge_Device.AddReg
+
+[OEMBridge_Device.AddReg]
+
+HKR,,EnumPropPages32,,"%13%\OEMBridgeProp.dll,OEMBridgePropPageProvider"
+
+[PropPage_Dir]
+OEMBridgeProp.dll
+
+[OEMBridge_Device.NT.HW]
+AddReg = OEMBridge_Device.HW.AddReg, OEMBridge_Device.HW.RemoveObsolete
+
+[OEMBridge_Device.HW.AddReg]
+
+HKR,,LoggingLevel,0x00010003,0
+
+HKR,,HdmiAudio,0x00010003,1
+
+HKR,,HdmiCec,0x00010003,0
+
+[OEMBridge_Device.HW.RemoveObsolete]
+
+HKR,,HdmiLpiMux,0x00000004
+HKR,,LpiMuxHoldClock,0x00000004
+HKR,,HdmiAudioEndpoint,0x00000004
+HKR,,HdmiAudioKsRoute,0x00000004
+
+[Drivers_Dir]
+OEMBridge.sys
+
+[OEMBridge_Device.NT.Services]
+AddService = OEMBridge,%SPSVCINST_ASSOCSERVICE%, OEMBridge_Service_Inst
+
+[OEMBridge_Service_Inst]
+DisplayName    = %ServiceDesc%
+ServiceType    = 1
+StartType      = 3
+ErrorControl   = 1
+ServiceBinary  = %13%\OEMBridge.sys
+
+[OEMBridge_Device.NT.Wdf]
+KmdfService = OEMBridge, OEMBridge_wdfsect
+
+[OEMBridge_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[P8Cec_Device.NT]
+CopyFiles = P8Cec_Dir
+
+[P8Cec_Dir]
+P8CecUde.sys
+
+[P8Cec_Device.NT.Services]
+AddService = P8CecUde,%SPSVCINST_ASSOCSERVICE%, P8Cec_Service_Inst
+
+[P8Cec_Service_Inst]
+DisplayName    = %P8CecSvc%
+ServiceType    = 1
+StartType      = 3
+ErrorControl   = 1
+ServiceBinary  = %13%\P8CecUde.sys
+
+[P8Cec_Device.NT.Wdf]
+KmdfService = P8CecUde, P8Cec_wdfsect
+
+[P8Cec_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ProviderName     = "Rubik Pi 3 WoA Project"
+ManufacturerName = "Lontium"
+DiskName         = "OEMBridge Installation Disk"
+DeviceName       = "Lontium LT9611 MIPI DSI to HDMI Bridge"
+ServiceDesc      = "Lontium LT9611 HDMI Bridge Service"
+P8CecName        = "Lontium LT9611 HDMI-CEC Adapter"
+P8CecSvc         = "Lontium LT9611 CEC Adapter Emulation (UDE)"
